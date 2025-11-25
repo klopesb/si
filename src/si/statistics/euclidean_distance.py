@@ -1,6 +1,6 @@
 import numpy as np
 
-
+#x = single sample / y = multiple samples 
 def euclidean_distance(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     """
     It computes the euclidean distance of a point (x) to a set of points y.
@@ -10,7 +10,7 @@ def euclidean_distance(x: np.ndarray, y: np.ndarray) -> np.ndarray:
 
     Parameters
     ----------
-    x: np.ndarray
+    x: np.ndarray 
         Point.
     y: np.ndarray
         Set of points.
@@ -20,7 +20,8 @@ def euclidean_distance(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     np.ndarray
         Euclidean distance for each point in y.
     """
-    return np.sqrt(((x - y) ** 2).sum(axis=1))
+
+    return np.sqrt(((x - y) ** 2).sum(axis=1)) #array contendo a distancia entre X (unica) e y (varias)
 
 
 if __name__ == '__main__':
@@ -33,4 +34,4 @@ if __name__ == '__main__':
     from sklearn.metrics.pairwise import euclidean_distances
     sklearn_distance = euclidean_distances(x.reshape(1, -1), y)
     assert np.allclose(our_distance, sklearn_distance)
-    print(our_distance, sklearn_distance)
+    print(our_distance, sklearn_distance) #o algoritmo feito e o algoritmo do sklearn

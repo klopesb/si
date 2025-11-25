@@ -63,7 +63,7 @@ class KNNClassifier(Model):
         self.dataset = dataset
         return self
 
-    def _get_closest_label(self, sample: np.ndarray) -> Union[int, str]:
+    def _transform(self, sample: np.ndarray) -> Union[int, str]:
         """
         It returns the closest label of the given sample
 
@@ -105,7 +105,7 @@ class KNNClassifier(Model):
         predictions: np.ndarray
             The predictions of the model
         """
-        predictions = np.apply_along_axis(self._get_closest_label, axis=1, arr=dataset.X)
+        predictions = np.apply_along_axis(self._transform, axis=1, arr=dataset.X)
         return predictions
 
     def _score(self, dataset: Dataset, predictions: np.ndarray) -> float:

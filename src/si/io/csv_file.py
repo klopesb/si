@@ -84,3 +84,5 @@ def write_csv(filename: str,
         data[dataset.label] = dataset.y
 
     data.to_csv(filename, sep=sep, index=False)
+
+print(Dataset)

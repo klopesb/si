@@ -125,6 +125,67 @@ class Dataset:
             "var": self.get_variance()
         }
         return pd.DataFrame.from_dict(data, orient="index", columns=self.features)
+    
+    def dropna(self) -> np.ndarray: #KB - Exercise 2, 2.1
+        """
+        Remove rows with missing values from the dataset.
+        
+        Returns
+        -------
+        Dataset
+            A new Dataset object without missing values
+        """
+        
+        return self.X[~np.isnan(self.X)]
+
+    
+
+    
+    def fillna(self, value = None) -> np.ndarray: #KB Exercise 2, 2.2
+        """
+        Replaces all NaN values in the features with a specified value, or the mean/median of each feature.
+        
+        Parameters
+        ----------
+        value : float or "mean" or "median"
+            The value to replace NaNs with, or "mean"/"median" to use the feature-wise mean/median.
+        
+        Returns
+        -------
+        self (modified Dataset object)
+        """
+
+        inds = np.where(np.isnan(self.X))
+
+        if value == "median":
+            fill_values = self.get_median()
+            self.X[inds] = np.take(fill_values, inds[1])
+
+        elif value == "mean":
+            fill_values = self.get_mean()
+            self.X[inds] = np.take(fill_values, inds[1])
+
+        else:
+            self.X[np.isnan(self.X)] = value
+
+
+        return self
+    
+
+    def remove_by_index(self, index = int) -> np.ndarray: #KB exercise 2, 2.3 
+        """
+        Remove a amostra pelo índice, atualizando X e y.
+        Parâmetros:
+            index: índice da amostra a ser removida
+        Retorna:
+            self (Dataset modificado)
+        """
+        self.X = np.delete(self.X, index, axis = 0) #axis indica a remoção por linha 
+        if self.y is not None:
+            self.y = np.delete(self.y, index, axis=0)
+
+        return self
+
 
     @classmethod
     def from_dataframe(cls, df: pd.DataFrame, label: str = None):
@@ -197,11 +258,13 @@ class Dataset:
         X = np.random.rand(n_samples, n_features)
         y = np.random.randint(0, n_classes, n_samples)
         return cls(X, y, features=features, label=label)
+    
 
+    
 
 if __name__ == '__main__':
-    X = np.array([[1, 2, 3], [4, 5, 6]])
-    y = np.array([1, 2])
+    X = np.array([[1, 5, 3], [4, 8, 6], [4, 8, 6]])
+    y = np.array([1, 2, 2])
     features = np.array(['a', 'b', 'c'])
     label = 'y'
     dataset = Dataset(X, y, features, label)
