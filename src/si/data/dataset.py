@@ -126,12 +126,12 @@ class Dataset:
         }
         return pd.DataFrame.from_dict(data, orient="index", columns=self.features)
     
-    def dropna(self) -> np.ndarray: #KB - Exercise 2, 2.1
+    #KB - Exercise 2, 2.1
+    def dropna(self) -> np.ndarray: 
         """
         Remove rows with missing values from the dataset.
         
-        Returns
-        -------
+        Returns:
         Dataset
             A new Dataset object without missing values
         """
@@ -140,18 +140,17 @@ class Dataset:
 
     
 
-    
-    def fillna(self, value = None) -> np.ndarray: #KB Exercise 2, 2.2
+    #KB Exercise 2, 2.2
+    def fillna(self, value = None) -> np.ndarray: 
         """
         Replaces all NaN values in the features with a specified value, or the mean/median of each feature.
         
-        Parameters
-        ----------
+        Parameters:
+
         value : float or "mean" or "median"
             The value to replace NaNs with, or "mean"/"median" to use the feature-wise mean/median.
         
-        Returns
-        -------
+        Returns:
         self (modified Dataset object)
         """
 
@@ -171,14 +170,16 @@ class Dataset:
 
         return self
     
-
+    #KB exercise 2, 2.3 
     def remove_by_index(self, index = int) -> np.ndarray: #KB exercise 2, 2.3 
         """
-        Remove a amostra pelo índice, atualizando X e y.
-        Parâmetros:
-            index: índice da amostra a ser removida
-        Retorna:
-            self (Dataset modificado)
+        Remove a sample by its index, updating X and y.
+
+        Parameters:
+            index: index of the sample to be removed
+
+        Returns:
+            self (modified Dataset)
         """
         self.X = np.delete(self.X, index, axis = 0) #axis indica a remoção por linha 
         if self.y is not None:

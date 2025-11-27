@@ -4,8 +4,37 @@ from si.base.transformer import Transformer
 #KB - Exercise 5 
 
 class PCA(Transformer):
+    """
+    Principal Component Analysis (PCA) transformer for dimensionality reduction.
+    
+    PCA reduces the dimensionality of data by projecting it onto the principal components
+    (directions of maximum variance). It performs eigendecomposition on the covariance matrix
+    to find these components.
+    
+    Parameters
+    ----------
+    n_components : int
+        Number of principal components to keep
+    
+    Attributes
+    ----------
+    mean : np.ndarray
+        Mean of each feature in the training data (used for centering)
+    components : np.ndarray
+        Principal components (eigenvectors), shape (n_features, n_components)
+    explained_variance : np.ndarray
+        Proportion of variance explained by each component
+    """
 
     def __init__(self, n_components):
+        """
+        Initialize the PCA transformer.
+        
+        Parameters
+        ----------
+        n_components : int
+            Number of principal components to retain
+        """
         super().__init__()
         self.n_components = n_components
         
@@ -14,77 +43,76 @@ class PCA(Transformer):
         self.components = None   # eigenvectors
         self.explained_variance = None  # eigenvalues / total
 
-    def _fit(self, X):
+    def _fit(self, dataset):
         """
-        X: matriz de dados (samples x features)
+        Fit the PCA model by computing principal components from the training data.
+        
+        The fitting process:
+        1. Centers the data by subtracting the mean
+        2. Computes the covariance matrix
+        3. Performs eigendecomposition
+        4. Sorts eigenvectors by eigenvalues (descending)
+        5. Selects the top n_components
+        6. Calculates explained variance ratios
+        
+        Parameters
+        ----------
+        X : np.ndarray
+            Training data matrix, shape (n_samples, n_features)
+        
+        Returns
+        -------
+        self : PCA
+            The fitted transformer instance
         """
-
-        # ---- Step 1: Center the data ----
+        X = dataset.X 
+        #Center the data 
         self.mean = np.mean(X, axis=0)
         X_centered = X - self.mean
 
-        # ---- Step 2: Covariance Matrix ----
+        #Covariance Matrix
         covariance_matrix = np.cov(X_centered, rowvar=False, ddof=1)
 
-        # ---- Step 3: Eigen Decomposition ----
+        #Eigen Decomposition
         eigenvalues, eigenvectors = np.linalg.eig(covariance_matrix)
 
-        # ---- Step 4: Sort by importance ----
+        #Sort by importance
         order = np.argsort(eigenvalues)[::-1]
 
         sorted_eigenvalues = eigenvalues[order]
         sorted_eigenvectors = eigenvectors[:, order]
 
-        # guardar apenas os primeiros k componentes
+        # Keep only the first k components
         self.components = sorted_eigenvectors[:, :self.n_components]
 
-        # ---- Step 5: explained variance ----
+        # Explained variance
         total_variance = np.sum(sorted_eigenvalues)
         self.explained_variance = sorted_eigenvalues / total_variance
 
         return self
 
-    def _transform(self, X):
+    def _transform(self, dataset):
         """
-        Reduz o dataset usando os componentes principais.
+        Transform data to the reduced dimensional space using fitted principal components.
+        
+        Projects the data onto the principal components by:
+        1. Centering the data using the training mean
+        2. Multiplying by the principal components matrix
+        
+        Parameters
+        ----------
+        X : np.ndarray
+            Data to transform, shape (n_samples, n_features)
+        
+        Returns
+        -------
+        np.ndarray
+            Transformed data in reduced dimensional space, shape (n_samples, n_components)
         """
-
-        # standardizar com a média aprendida
+        X = dataset.X 
         X_centered = (X - self.mean) 
-
-        # ---- Step 6: dimensionality reduction ----
         reduced_data = np.dot(X_centered, self.components)
 
 
         return reduced_data
     
-
-if __name__ == "__main__":
-
-    X = np.array([
-    [   1,   2,  -1,   4,  10],
-    [   3,  -3,  -3,  12, -15],
-    [   2,   1,  -2,   4,   5],
-    [   5,   1,  -5,  10,   5],
-    [   2,   3,  -3,   5,  12],
-    [   4,   0,  -3,  16,   2],
-])
-
-    # ---- Define PCA ----
-    pca = PCA(n_components=1)
-
-    # ---- Fit + Transform ----
-    X_reduced = pca.fit_transform(X)
-
-    # ---- Output ----
-    print("Mean:")
-    print(pca.mean)
-
-    print("\nComponents (eigenvectors):")
-    print(pca.components)
-
-    print("\nExplained variance (ratio):")
-    print(pca.explained_variance)
-
-    print("\nReduced dataset:")
-    print(X_reduced)

@@ -9,15 +9,13 @@ def tanimoto_similarity(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     The Tanimoto coefficient is calculated as:
     Similarity = (x · y) / (|x|² + |y|² - x · y)
     
-    Parameters
-    ----------
+    Parameters:
     x : np.ndarray
         A single binary sample (1D array)
     y : np.ndarray
         Multiple binary samples (2D array), where each row is a sample
     
-    Returns
-    -------
+    Returns:
     np.ndarray
         An array containing the Tanimoto similarities between x and each sample in y
     """

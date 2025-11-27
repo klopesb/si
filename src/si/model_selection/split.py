@@ -42,7 +42,7 @@ def train_test_split(dataset: Dataset, test_size: float = 0.2, random_state: int
     test = Dataset(dataset.X[test_idxs], dataset.y[test_idxs], features=dataset.features, label=dataset.label)
     return train, test
 
-#KB Exercise 6
+#KB Exercise 6.1
 def stratified_train_test_split(dataset: Dataset, test_size: float = 0.2, random_state: int = 42) -> Tuple[Dataset, Dataset]:
     """
     Split the dataset into training and testing sets using stratified sampling.

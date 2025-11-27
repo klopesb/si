@@ -5,21 +5,21 @@ from si.data.dataset import Dataset
 from si.statistics.f_classification import f_classification
 from sklearn.feature_selection import SelectPercentile as SklearnSelectPercentile
 
-#KB Exercise 
+#KB - Exercise 3.1
 class SelectPercentile(Transformer):
     """
     Select features according to a percentile of the highest scores.
     Feature ranking is performed by computing the scores of each feature using a scoring function.
 
-    Parameters
-    ----------
+    Parameters:
+
     score_func: callable, default=f_classification
         Function taking dataset and returning a pair of arrays (scores, p_values)
     percentile: int, default=10
         Percentile of top features to select (between 0 and 100).
 
-    Attributes
-    ----------
+    Attributes:
+
     F: array, shape (n_features,)
         F scores of features.
     p: array, shape (n_features,)
@@ -30,8 +30,8 @@ class SelectPercentile(Transformer):
         """
         Select features according to a percentile of the highest scores.
 
-        Parameters
-        ----------
+        Parameters:
+ 
         score_func: callable, default=f_classification
             Function taking dataset and returning a pair of arrays (scores, p_values)
         percentile: int, default=10
@@ -47,13 +47,13 @@ class SelectPercentile(Transformer):
         """
         It fits SelectPercentile to compute the F scores and p-values.
 
-        Parameters
-        ----------
+        Parameters:
+
         dataset: Dataset
             A labeled dataset
 
-        Returns
-        -------
+        Returns:
+
         self: object
             Returns self.
         """
@@ -65,13 +65,13 @@ class SelectPercentile(Transformer):
         It transforms the dataset by selecting features based on the specified percentile.
         Handles ties at the threshold to maintain the correct number of features.
 
-        Parameters
-        ----------
+        Parameters:
+
         dataset: Dataset
             A labeled dataset
 
-        Returns
-        -------
+        Returns:
+
         dataset: Dataset
             A labeled dataset with the selected features based on percentile.
         """
@@ -96,18 +96,3 @@ class SelectPercentile(Transformer):
         return Dataset(X=dataset.X[:, idxs], y=dataset.y, features=list(features), label=dataset.label)
 
 
-if __name__ == '__main__':
-
-
-    dataset = Dataset(X=np.array([[0, 2, 0, 3],
-                                   [0, 1, 4, 3],
-                                   [0, 1, 1, 3]]),
-                       y=np.array([0, 1, 0]),
-                       features=["f1", "f2", "f3", "f4"],
-                       label="y")
-
-    selector = SelectPercentile(percentile=50)
-    selector = selector.fit(dataset)
-    print("\nOriginal example - F-scores:", selector.F)
-    print("Selected features (50%):", selector.transform(dataset).features)
-    print("Number of features:", len(selector.transform(dataset).features))

@@ -8,20 +8,46 @@ from si.metrics.mse import mse
 
 class RidgeRegressionLeastSquares(Model):
     """
-        parameters:
-    - l2_penalty -  L2 regularization parameter
-    - scale - wheter to scale the data or not
-    • estimated parameters:
-    - theta - the coefficients of the model for every feature
-    - theta_zero - the zero coefficient (y intercept)
-    - mean - mean of the dataset (for every feature)
-    - std - standard deviation of the dataset (for every feature)
-    • methods:
-    - fit - estimates the theta and theta_zero coefficients, mean and std
-    - predict - predicts the dependent variable (y) using the estimated theta coefficients
-    - score - calculates the error between the real and predicted y values 
+    Ridge Regression using the closed-form Least Squares solution with L2 regularization.
+    
+    Ridge regression adds an L2 penalty term to the ordinary least squares objective,
+    which helps prevent overfitting by shrinking the coefficients. The model is solved
+    using the closed-form solution: θ = (X^T X + λI)^(-1) X^T y
+    
+    Parameters
+    ----------
+    l2_penalty : float, default=1.0
+        L2 regularization parameter (lambda). Higher values increase regularization strength
+    scale : bool, default=True
+        Whether to standardize features by removing mean and scaling to unit variance
+    **kwargs : dict
+        Additional keyword arguments passed to the parent Model class
+    
+    Attributes
+    ----------
+    theta : np.ndarray
+        Coefficients for each feature (excluding intercept)
+    theta_zero : float
+        Intercept term (bias)
+    mean : np.ndarray
+        Mean of each feature in the training data (used for scaling)
+    std : np.ndarray
+        Standard deviation of each feature in the training data (used for scaling)
     """
+
     def __init__(self, l2_penalty: float = 1.0, scale: bool = True, **kwargs):
+        """
+        Initialize the Ridge Regression model.
+        
+        Parameters
+        ----------
+        l2_penalty : float, default=1.0
+            L2 regularization strength (lambda)
+        scale : bool, default=True
+            If True, standardize features before fitting
+        **kwargs : dict
+            Additional arguments for the parent Model class
+        """
         super().__init__(**kwargs)
         self.l2_penalty = l2_penalty
         self.scale = scale
@@ -34,6 +60,26 @@ class RidgeRegressionLeastSquares(Model):
         
 
     def _fit(self, dataset: Dataset) -> 'RidgeRegressionLeastSquares':
+        """
+        Fit the Ridge Regression model using the closed-form solution.
+        
+        The fitting process:
+        1. Optionally standardizes the features
+        2. Adds intercept term to the design matrix
+        3. Creates penalty matrix (λI) without penalizing the intercept
+        4. Solves the normal equation: θ = (X^T X + λI)^(-1) X^T y
+        5. Separates intercept from feature coefficients
+        
+        Parameters
+        ----------
+        dataset : Dataset
+            Training dataset containing features (X) and targets (y)
+        
+        Returns
+        -------
+        self : RidgeRegressionLeastSquares
+            The fitted model instance
+        """
         X = dataset.X
         y = dataset.y
         
@@ -69,6 +115,24 @@ class RidgeRegressionLeastSquares(Model):
 
 
     def _predict(self, dataset: Dataset) -> np.ndarray:
+        """
+        Predict target values for new data using the fitted Ridge Regression model.
+        
+        The prediction process:
+        1. Standardizes features using training mean/std (if scaling was enabled)
+        2. Adds intercept term to the design matrix
+        3. Computes predictions using: y_pred = X θ + θ_0
+        
+        Parameters
+        ----------
+        dataset : Dataset
+            Dataset containing features (X) to make predictions on
+        
+        Returns
+        -------
+        np.ndarray
+            Predicted target values, shape (n_samples,)
+        """
         X = dataset.X
         
         # 1. Scale using train mean/std
@@ -87,7 +151,21 @@ class RidgeRegressionLeastSquares(Model):
 
 
     def _score(self, dataset: Dataset, predictions: np.ndarray) -> float:
-        # 1. mse
+        """
+        Calculate the Mean Squared Error (MSE) between predictions and actual values.
+        
+        Parameters
+        ----------
+        dataset : Dataset
+            Dataset containing true target values (y)
+        predictions : np.ndarray
+            Predicted target values
+        
+        Returns
+        -------
+        float
+            Mean Squared Error (MSE) - lower values indicate better fit
+        """
         return mse(dataset.y, predictions)
     
 if __name__ == '__main__':
