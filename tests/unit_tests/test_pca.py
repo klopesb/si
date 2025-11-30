@@ -5,6 +5,7 @@ from si.decomposition.pca import PCA
 from si.io.csv_file import read_csv
 import numpy as np
 
+#KB test exercise 5
 
 class TestPCA(TestCase):
 

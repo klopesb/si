@@ -6,6 +6,7 @@ from si.io.csv_file import read_csv
 from si.models.knn_regressor import KNNRegressor
 from si.model_selection.split import train_test_split
 
+#KB test exercise 7.2
 
 class TestKNNRegressor(TestCase):
 

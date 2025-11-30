@@ -5,6 +5,7 @@ from si.io.csv_file import read_csv
 from si.model_selection.split import train_test_split
 from si.models.ridge_regression_least_squares import RidgeRegressionLeastSquares
 
+#KB test exercise 8
 
 class TestRidgeRegressionLeastSquares(TestCase):
 

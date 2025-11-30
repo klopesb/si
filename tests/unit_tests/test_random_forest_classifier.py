@@ -5,6 +5,7 @@ from si.io.csv_file import read_csv
 from si.model_selection.split import train_test_split
 from si.models.random_forest_classifier import RandomForestClassifier
 
+#KB test exercise 9
 
 class TestRandomForestClassifier(TestCase):
 
