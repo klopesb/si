@@ -6,6 +6,7 @@ from si.data.dataset import Dataset
 from si.model_selection.cross_validate import k_fold_cross_validation
 
 
+
 def randomized_search_cv(model: Model,
                          dataset: Dataset,
                          hyperparameter_grid: Dict[str, List[Any]],
@@ -47,7 +48,13 @@ def randomized_search_cv(model: Model,
         - 'best_hyperparameters': best combination of hyperparameters
         - 'best_score': best mean score achieved
 
+    Raises
+    ------
+    ValueError
+        If any hyperparameter in the grid does not exist in the model
+
     """
+
     # Step 1: Check if the provided hyperparameters are valid
     for hyperparameter in hyperparameter_grid.keys():
         if not hasattr(model, hyperparameter):
