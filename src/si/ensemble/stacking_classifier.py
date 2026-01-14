@@ -1,5 +1,7 @@
 import numpy as np
 from si.base.model import Model
+from si.data.dataset import Dataset
+from si.metrics.accuracy import accuracy
 
 
 class StackingClassifier(Model):
@@ -25,7 +27,7 @@ class StackingClassifier(Model):
         The fitted final model
     """
     
-    def __init__(self, models, final_model, **kwargs):
+    def __init__(self, models: list, final_model: Model, **kwargs):
         """
         Initialize the StackingClassifier.
         
@@ -40,7 +42,7 @@ class StackingClassifier(Model):
         self.models = models
         self.final_model = final_model
         
-    def _fit(self, X, y):
+    def _fit(self, dataset: Dataset) -> 'StackingClassifier':
         """
         Train the stacking classifier.
         
@@ -52,10 +54,8 @@ class StackingClassifier(Model):
         
         Parameters
         ----------
-        X : np.ndarray
-            Training data of shape (n_samples, n_features)
-        y : np.ndarray
-            Target values of shape (n_samples,)
+        dataset : Dataset
+            The dataset to fit the model to
             
         Returns
         -------
@@ -64,20 +64,22 @@ class StackingClassifier(Model):
         """
         # Step 1: Train the initial set of models
         for model in self.models:
-            model.fit(X, y)
+            model.fit(dataset)
         
         # Step 2: Get predictions from the initial set of models
         base_predictions = np.column_stack([
-            model.predict(X) for model in self.models
+            model.predict(dataset) for model in self.models
         ])
         
         # Step 3: Train the final model with the predictions of the initial set of models
-        self.final_model.fit(base_predictions, y)
+        # Create a new dataset with base predictions as features and original labels
+        stacked_dataset = Dataset(X=base_predictions, y=dataset.y)
+        self.final_model.fit(stacked_dataset)
         
         # Step 4: Return itself
         return self
     
-    def _predict(self, X):
+    def _predict(self, dataset: Dataset) -> np.ndarray:
         """
         Predict class labels using the stacking classifier.
         
@@ -88,49 +90,44 @@ class StackingClassifier(Model):
         
         Parameters
         ----------
-        X : np.ndarray
-            Test data of shape (n_samples, n_features)
+        dataset : Dataset
+            The dataset to predict the classes of
             
         Returns
         -------
         predictions : np.ndarray
-            Predicted class labels of shape (n_samples,)
+            Predicted class labels
         """
         # Step 1: Get predictions from the initial set of models
         base_predictions = np.column_stack([
-            model.predict(X) for model in self.models
+            model.predict(dataset) for model in self.models
         ])
         
         # Step 2: Get the final predictions using the final model
-        final_predictions = self.final_model.predict(base_predictions)
+        # Create a new dataset with base predictions as features
+        stacked_dataset = Dataset(X=base_predictions, y=dataset.y)
+        final_predictions = self.final_model.predict(stacked_dataset)
         
         return final_predictions
     
-    def _score(self, X, y):
+    def _score(self, dataset: Dataset, predictions: np.ndarray) -> float:
         """
         Compute the accuracy score of the stacking classifier.
         
         Algorithm:
-        1. Get predictions using the predict method
-        2. Compute the accuracy between predicted and real values
+        1. Compute the accuracy between predicted and real values
         
         Parameters
         ----------
-        X : np.ndarray
-            Test data of shape (n_samples, n_features)
-        y : np.ndarray
-            True labels of shape (n_samples,)
+        dataset : Dataset
+            The dataset to evaluate the model on
+        predictions : np.ndarray
+            An array with the predictions
             
         Returns
         -------
         accuracy : float
             The accuracy score (proportion of correct predictions)
         """
-        # Step 1: Get predictions using the predict method
-        predictions = self.predict(X)
-        
-        # Step 2: Compute the accuracy between predicted and real values
-        accuracy = np.sum(predictions == y) / len(y)
-        
-        return accuracy
-
+        # Compute the accuracy between predicted and real values
+        return accuracy(dataset.y, predictions)
